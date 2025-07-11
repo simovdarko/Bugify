@@ -1,11 +1,16 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+
 import '../database/database.dart';
+import '../l10n/app_localizations.dart';
 import '../models/insect_model.dart';
-import '../screens/insect_description_screen.dart';
-import '../screens/home_screen.dart';
+import 'insect_description_screen.dart';
+import 'home_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
+  final Function(Locale) onLocaleChange;
+  const HistoryScreen({Key? key, required this.onLocaleChange}) : super(key: key);
+
   @override
   _HistoryScreenState createState() => _HistoryScreenState();
 }
@@ -26,23 +31,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _confirmDelete(BuildContext context, InsectModel insect) {
+    final local = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Бришење', style: TextStyle(color: Color(0xFF2E7D32))),
-        content: Text('Дали сте сигурни дека сакате да го избришете "${insect.name}"?'),
+        title: Text(local.delete, style: const TextStyle(color: Color(0xFF2E7D32))),
+        content: Text('${local.confirmDelete} "${insect.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Откажи', style: TextStyle(color: Color(0xFF2E7D32))),
+            child: Text(local.cancel, style: const TextStyle(color: Color(0xFF2E7D32))),
           ),
           TextButton(
             onPressed: () async {
               Navigator.of(ctx).pop();
-              await DatabaseHelper.instance.deleteInsect(insect.name);
+              await DatabaseHelper.instance.deleteInsect(insect.id!);
               _refreshInsectHistory();
             },
-            child: Text('Избриши', style: TextStyle(color: Colors.red)),
+            child: Text(local.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -51,6 +57,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -63,10 +71,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
           color: Colors.black.withOpacity(0.3),
           child: Column(
             children: [
-              SizedBox(height: 60),
+              const SizedBox(height: 60),
               Text(
-                'Историја на препознавања',
-                style: TextStyle(
+                local.history,
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -77,7 +85,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   future: insectHistory,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
+                      return const Center(
                         child: CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
@@ -87,8 +95,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return Center(
                         child: Text(
-                          'Нема историја на препознавања',
-                          style: TextStyle(
+                          local.noHistory,
+                          style: const TextStyle(
                             fontSize: 20,
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -100,7 +108,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     final insects = snapshot.data!;
 
                     return ListView.builder(
-                      padding: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 80),
+                      padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 80),
                       itemCount: insects.length,
                       itemBuilder: (context, index) {
                         final insect = insects[index];
@@ -109,19 +117,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           elevation: 4,
-                          margin: EdgeInsets.only(bottom: 16),
+                          margin: const EdgeInsets.only(bottom: 16),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(12),
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => InsectDescriptionScreen(insect: insect),
+                                  builder: (context) => InsectDescriptionScreen(
+                                    insect: insect,
+                                    showRetryButton: false,
+                                  ),
                                 ),
                               ).then((_) => _refreshInsectHistory());
                             },
                             child: Padding(
-                              padding: EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(12),
                               child: Row(
                                 children: [
                                   Container(
@@ -134,18 +145,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
                                       child: insect.imageUrl.isNotEmpty && File(insect.imageUrl).existsSync()
-                                          ? Image.file(
-                                        File(insect.imageUrl),
-                                        width: 80,
-                                        height: 80,
-                                        fit: BoxFit.cover,
-                                      )
-                                          : Center(
+                                          ? Image.file(File(insect.imageUrl), fit: BoxFit.cover)
+                                          : const Center(
                                         child: Icon(Icons.bug_report, size: 40, color: Color(0xFF2E7D32)),
                                       ),
                                     ),
                                   ),
-                                  SizedBox(width: 16),
+                                  const SizedBox(width: 16),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,18 +164,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                             color: Colors.green[800],
                                           ),
                                         ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          "Видено на: ${insect.lastSeenTime.toLocal()}".split('.').first,
-                                          style: TextStyle(
-                                            color: Colors.green[600],
-                                          ),
-                                        ),
+                                        const SizedBox(height: 4),
                                       ],
                                     ),
                                   ),
                                   IconButton(
-                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    icon: const Icon(Icons.delete, color: Colors.red),
                                     onPressed: () => _confirmDelete(context, insect),
                                   ),
                                 ],
@@ -184,7 +184,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
               Container(
                 height: 70,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.black45,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(16),
@@ -195,20 +195,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                      MaterialPageRoute(builder: (context) => HomeScreen(onLocaleChange: widget.onLocaleChange)),
                     );
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.arrow_back, color: Colors.white, size: 24),
-                      SizedBox(width: 8),
+                      const Icon(Icons.arrow_back, color: Colors.white, size: 24),
+                      const SizedBox(width: 8),
                       Text(
-                        'Назад кон главното мени',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
+                        local.backToMenu,
+                        style: const TextStyle(fontSize: 18, color: Colors.white),
                       ),
                     ],
                   ),

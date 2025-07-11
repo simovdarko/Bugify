@@ -85,12 +85,12 @@ class DatabaseHelper {
       return [];
     }
   }
-  Future<void> deleteInsect(String name) async {
+  Future<void> deleteInsect(int id) async {
     final db = await database;
     await db.delete(
       'insects',
-      where: 'name = ?',
-      whereArgs: [name],
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 }

@@ -1,27 +1,36 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
+import '../l10n/app_localizations.dart';
+import '../services/azure_vision_service.dart';
 import '../screens/insect_description_screen.dart';
 import '../screens/home_screen.dart';
 
 class InsectRecognitionScreen extends StatefulWidget {
+  final Function(Locale) onLocaleChange;
+  const InsectRecognitionScreen({Key? key, required this.onLocaleChange}) : super(key: key);
   @override
   _InsectRecognitionScreenState createState() => _InsectRecognitionScreenState();
 }
 
 class _InsectRecognitionScreenState extends State<InsectRecognitionScreen> {
+  final AzureVisionService _azureVisionService = AzureVisionService();
   final ImagePicker _picker = ImagePicker();
 
-  // Simulate insect recognition logic
   Future<void> _recognizeInsect(String imagePath) async {
-    try {
-      // Replace this with your actual image processing logic
-      final insect = {
-        'name': 'Butterfly',
-        'description': 'Ова е пеперутка. Позната по своите шарени крилја.',
-        'imagePath': imagePath,
-      };
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        ),
+      ),
+    );
 
+    try {
+      final insect = await _azureVisionService.processInsectImage(imagePath,context);
+      Navigator.of(context).pop();
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -29,8 +38,9 @@ class _InsectRecognitionScreenState extends State<InsectRecognitionScreen> {
         ),
       );
     } catch (_) {
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Грешка при препознавање на инсектот')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.recognitionError)),
       );
     }
   }
@@ -45,13 +55,14 @@ class _InsectRecognitionScreenState extends State<InsectRecognitionScreen> {
       await _recognizeInsect(picked.path);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Нема избрано слика')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.noImageSelected)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -68,8 +79,8 @@ class _InsectRecognitionScreenState extends State<InsectRecognitionScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 24.0),
                   child: Text(
-                    'Препознај Инсект',
-                    style: TextStyle(
+                    loc.recognizeInsect,
+                    style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -83,13 +94,13 @@ class _InsectRecognitionScreenState extends State<InsectRecognitionScreen> {
                     children: [
                       _buildMainButton(
                         icon: Icons.camera_alt,
-                        label: 'Камера',
+                        label: loc.camera,
                         onTap: () => _getImage(true),
                       ),
-                      SizedBox(height: 40),
+                      const SizedBox(height: 40),
                       _buildMainButton(
                         icon: Icons.photo,
-                        label: 'Галерија',
+                        label: loc.gallery,
                         onTap: () => _getImage(false),
                       ),
                     ],
@@ -98,20 +109,20 @@ class _InsectRecognitionScreenState extends State<InsectRecognitionScreen> {
                 GestureDetector(
                   onTap: () => Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => HomeScreen()),
+                    MaterialPageRoute(builder: (_) => HomeScreen(onLocaleChange: widget.onLocaleChange)),
                   ),
                   child: Container(
                     color: Colors.black54,
-                    padding: EdgeInsets.symmetric(vertical: 14),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     width: double.infinity,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.arrow_back, color: Colors.white),
-                        SizedBox(width: 8),
+                        const Icon(Icons.arrow_back, color: Colors.white),
+                        const SizedBox(width: 8),
                         Text(
-                          'Назад',
-                          style: TextStyle(
+                          loc.back,
+                          style: const TextStyle(
                             fontSize: 20,
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
@@ -139,22 +150,22 @@ class _InsectRecognitionScreenState extends State<InsectRecognitionScreen> {
       borderRadius: BorderRadius.circular(24),
       child: Container(
         width: 280,
-        padding: EdgeInsets.symmetric(vertical: 28),
-        margin: EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 28),
+        margin: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.85),
           borderRadius: BorderRadius.circular(24),
         ),
         child: Column(
           children: [
-            Icon(icon, size: 60, color: Color(0xFF1B5E20)),
-            SizedBox(height: 12),
+            Icon(icon, size: 60, color: const Color(0xFF004E32)),
+            const SizedBox(height: 12),
             Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1B5E20),
+                color: Color(0xFF004E32),
               ),
             )
           ],

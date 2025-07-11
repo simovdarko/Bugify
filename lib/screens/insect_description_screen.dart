@@ -1,15 +1,22 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../database/database.dart';
+import '../l10n/app_localizations.dart';
 import '../models/insect_model.dart';
 
 class InsectDescriptionScreen extends StatelessWidget {
   final InsectModel insect;
+  final bool showRetryButton;
 
-  const InsectDescriptionScreen({Key? key, required this.insect}) : super(key: key);
+  const InsectDescriptionScreen({
+    Key? key,
+    required this.insect,
+    this.showRetryButton = true,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -35,7 +42,7 @@ class InsectDescriptionScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(24),
                         child: insect.imageUrl.isNotEmpty && File(insect.imageUrl).existsSync()
                             ? Image.file(File(insect.imageUrl), fit: BoxFit.cover)
-                            : const Center(
+                            : Center(
                           child: Icon(Icons.bug_report, size: 100, color: Colors.white),
                         ),
                       ),
@@ -44,7 +51,7 @@ class InsectDescriptionScreen extends StatelessWidget {
                       top: 10,
                       left: 10,
                       child: IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        icon: Icon(Icons.arrow_back, color: Colors.white),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                     ),
@@ -52,7 +59,7 @@ class InsectDescriptionScreen extends StatelessWidget {
                       top: 10,
                       right: 10,
                       child: IconButton(
-                        icon: const Icon(Icons.share, color: Colors.white),
+                        icon: Icon(Icons.share, color: Colors.white),
                         onPressed: () {},
                       ),
                     ),
@@ -76,10 +83,9 @@ class InsectDescriptionScreen extends StatelessWidget {
                           textAlign: TextAlign.justify,
                         ),
                         const SizedBox(height: 24),
-                        const Center(
-                          child: Text(
-                            "ДЕТАЛИ",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                        Center(
+                          child: Text(local.details,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -88,41 +94,31 @@ class InsectDescriptionScreen extends StatelessWidget {
                           runSpacing: 12,
                           alignment: WrapAlignment.center,
                           children: [
-                            _buildDetailCard(Icons.public, "Региони", insect.regions),
-                            _buildDetailCard(Icons.access_time, "Активен период", insect.activeTime),
-                            _buildDetailCard(Icons.nature, "Преферирани растенија", insect.flowerPreference),
-                            _buildDetailCard(Icons.restaurant, "Исхрана", insect.diet),
-                            _buildDetailCard(Icons.warning, "Опасен", insect.dangerous ? "Да" : "Не"),
-                            _buildDetailCard(Icons.category, "Тип", insect.insectType),
-                            _buildDetailCard(Icons.height, "Големина", "${insect.size} см"),
-                            _buildDetailCard(Icons.calendar_today, "Животен век", insect.lifespan),
+                            _buildDetailCard(Icons.public, local.region, insect.regions),
+                            _buildDetailCard(Icons.access_time, local.activePeriod, insect.activeTime),
+                            _buildDetailCard(Icons.nature, local.flowerPreference, insect.flowerPreference),
+                            _buildDetailCard(Icons.restaurant, local.diet, insect.diet),
+                            _buildDetailCard(Icons.warning, local.dangerous, insect.dangerous ? local.yes : local.no),
+                            _buildDetailCard(Icons.category, local.type, insect.insectType),
+                            _buildDetailCard(Icons.height, local.size, "${insect.size} см"),
+                            _buildDetailCard(Icons.calendar_today, local.lifespan, insect.lifespan),
                           ],
                         ),
                         const SizedBox(height: 28),
-                        ElevatedButton.icon(
-                          onPressed: () async {
-                            try {
-                              await DatabaseHelper.instance.addInsect(insect);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Додадено во историја.")),
-                              );
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Грешка при зачувување во историјата.")),
-                              );
-                            }
-                          },
-                          icon: const Icon(Icons.history, color: Colors.white),
-                          label: const Text("Зачувај во историја"),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black87,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        if (showRetryButton)
+                          ElevatedButton.icon(
+                            onPressed: () => Navigator.of(context).pop(),
+                            icon: const Icon(Icons.replay, color: Colors.white),
+                            label: Text(local.retryScan),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red[700],
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -138,39 +134,24 @@ class InsectDescriptionScreen extends StatelessWidget {
   Widget _buildDetailCard(IconData icon, String label, String value) {
     if (value.isEmpty) return const SizedBox();
 
-    return SizedBox(
-      width: 160,
-      height: 150,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.85),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
-            )
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(icon, size: 22, color: Colors.black87),
-            const SizedBox(height: 6),
-            Text(
-              label,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black87),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: const TextStyle(fontSize: 12, color: Colors.black87),
-              textAlign: TextAlign.center,
-            ),
-          ],
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 160, maxWidth: 160, minHeight: 150),
+      child: IntrinsicHeight(
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.85),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, size: 22, color: Colors.black87),
+              const SizedBox(height: 6),
+              Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black87), textAlign: TextAlign.center),
+              const SizedBox(height: 4),
+              Text(value, style: const TextStyle(fontSize: 12, color: Colors.black87), textAlign: TextAlign.center),
+            ],
+          ),
         ),
       ),
     );

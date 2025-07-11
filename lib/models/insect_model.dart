@@ -1,4 +1,5 @@
 class InsectModel {
+  final int? id;
   final String name;
   final String description;
   final String activeTime;
@@ -18,6 +19,7 @@ class InsectModel {
   final String regions;
 
   InsectModel({
+    this.id,
     required this.name,
     required this.description,
     required this.activeTime,
@@ -37,48 +39,9 @@ class InsectModel {
     required this.regions,
   });
 
-  InsectModel copyWith({
-    String? name,
-    String? description,
-    String? activeTime,
-    String? location,
-    bool? dangerous,
-    String? diet,
-    String? scientificName,
-    String? imageUrl,
-    DateTime? lastSeenTime,
-    String? insectType,
-    String? flowerPreference,
-    String? lifespan,
-    String? frequency,
-    String? activityPeriod,
-    String? abilities,
-    double? size,
-    String? regions,
-  }) {
-    return InsectModel(
-      name: name ?? this.name,
-      description: description ?? this.description,
-      activeTime: activeTime ?? this.activeTime,
-      location: location ?? this.location,
-      dangerous: dangerous ?? this.dangerous,
-      diet: diet ?? this.diet,
-      scientificName: scientificName ?? this.scientificName,
-      imageUrl: imageUrl ?? this.imageUrl,
-      lastSeenTime: lastSeenTime ?? this.lastSeenTime,
-      insectType: insectType ?? this.insectType,
-      flowerPreference: flowerPreference ?? this.flowerPreference,
-      lifespan: lifespan ?? this.lifespan,
-      frequency: frequency ?? this.frequency,
-      activityPeriod: activityPeriod ?? this.activityPeriod,
-      abilities: abilities ?? this.abilities,
-      size: size ?? this.size,
-      regions: regions ?? this.regions,
-    );
-  }
-
   factory InsectModel.fromJson(Map<String, dynamic> json) {
     return InsectModel(
+      id: json['id'],
       name: json['name'] ?? '',
       description: json['description'] ?? '',
       activeTime: json['activeTime'] ?? '',
@@ -103,9 +66,8 @@ class InsectModel {
     );
   }
 
-
   Map<String, dynamic> toMap() {
-    return {
+    final map = {
       'name': name,
       'description': description,
       'activeTime': activeTime,
@@ -124,5 +86,9 @@ class InsectModel {
       'size': size,
       'regions': regions,
     };
+    if (id != null) {
+      map['id'] = id!;
+    }
+    return map;
   }
 }
