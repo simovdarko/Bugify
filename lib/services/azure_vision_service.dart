@@ -6,6 +6,8 @@ import '../database/database.dart';
 import '../models/insect_model.dart';
 
 class AzureVisionService {
+
+
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
 
   Future<InsectModel> processInsectImage(String imagePath, BuildContext context) async {
@@ -167,4 +169,56 @@ ALL values must be in English. ''';
       'regions': [],
     };
   }
-}
+
+  Future<List<String>> getMultipleFunFacts(String locale) async {
+    final isMacedonian = locale == 'mk';
+
+    try {
+      final systemPrompt = isMacedonian
+          ? '''Дај ми три различни интересни факти за инсекти. Одговори како нумерирана листа со по еден ред за секој факт, на македонски.'''
+          : '''Give me three different fun facts about insects. Respond as a numbered list, one sentence per fact, in English.''';
+
+      final response = await http.post(
+        Uri.parse(openAIEndpoint),
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": openAIKey,
+        },
+        body: jsonEncode({
+          "messages": [
+            {"role": "system", "content": systemPrompt},
+            {"role": "user", "content": "Give me 3 fun facts about insects."}
+          ],
+          "temperature": 0.7,
+          "max_tokens": 250,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final decoded = json.decode(utf8.decode(response.bodyBytes));
+        final content = decoded['choices'][0]['message']['content'] as String;
+
+        // Раздвој по редови и филтрирај празни редови
+        final facts = content
+            .split(RegExp(r'\n+'))
+            .map((line) => line.replaceFirst(RegExp(r'^\d+[).\s-]*'), '').trim())
+            .where((line) => line.isNotEmpty)
+            .toList();
+
+        return facts.length >= 3 ? facts.sublist(0, 3) : facts;
+      } else {
+        throw Exception("OpenAI API error: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error fetching fun facts: $e");
+      return [
+        isMacedonian
+            ? "Интересен факт не е достапен моментално."
+            : "Fun fact is not available at the moment."
+      ];
+    }
+  }
+
+
+
+    }

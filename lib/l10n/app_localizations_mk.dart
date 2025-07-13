@@ -15,7 +15,7 @@ class AppLocalizationsMk extends AppLocalizations {
   String get splashSubtitle => 'Идентификација на инсекти';
 
   @override
-  String get homeTitle => 'Идентификација на инсекти';
+  String get homeTitle => 'Главно мени';
 
   @override
   String get recognizeInsect => 'Препознај инсект';
@@ -140,4 +140,13 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get gallery => 'Галерија';
+
+  @override
+  String get showAnotherFact => 'Покажи друг факт';
+
+  @override
+  String get funFactTitle => 'Интересен факт за инсекти';
+
+  @override
+  String get funFacts => 'Интересни факти';
 }

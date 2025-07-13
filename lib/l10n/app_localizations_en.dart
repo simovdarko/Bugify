@@ -15,7 +15,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get splashSubtitle => 'Insect Identification';
 
   @override
-  String get homeTitle => 'Insect Identification';
+  String get homeTitle => 'Main menu';
 
   @override
   String get recognizeInsect => 'Recognize Insect';
@@ -140,4 +140,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gallery => 'Gallery';
+
+  @override
+  String get showAnotherFact => 'Show Another Fact';
+
+  @override
+  String get funFactTitle => 'Fun Insect Fact';
+
+  @override
+  String get funFacts => 'Fun Facts';
 }

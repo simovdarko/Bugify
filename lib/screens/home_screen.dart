@@ -4,6 +4,7 @@ import '../l10n/app_localizations.dart';
 import 'recognition_screen.dart';
 import 'history_screen.dart';
 import 'about_screen.dart';
+import 'fun_facts_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final Function(Locale) onLocaleChange;
@@ -27,7 +28,8 @@ class HomeScreen extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           const Image(
-            image: NetworkImage('https://i.pinimg.com/564x/25/d0/5c/25d05c5abceb0d29b11e1bdd0793c11d.jpg'),
+            image: NetworkImage(
+                'https://i.pinimg.com/564x/25/d0/5c/25d05c5abceb0d29b11e1bdd0793c11d.jpg'),
             fit: BoxFit.cover,
           ),
           Container(color: Colors.black.withOpacity(0.3)),
@@ -47,49 +49,67 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildActionCard(
-                        context,
-                        icon: Icons.bug_report,
-                        label: local.scanInsect,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => InsectRecognitionScreen(onLocaleChange: onLocaleChange),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 40),
-                      _buildActionCard(
-                        context,
-                        icon: Icons.history,
-                        label: local.history,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => HistoryScreen(onLocaleChange: onLocaleChange),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 40),
-                      _buildActionCard(
-                        context,
-                        icon: Icons.info_outline,
-                        label: local.about,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const AboutScreen()),
-                          );
-                        },
-                      ),
-                    ],
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildActionCard(
+                          context,
+                          icon: Icons.bug_report,
+                          label: local.scanInsect,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    InsectRecognitionScreen(onLocaleChange: onLocaleChange),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 40),
+                        _buildActionCard(
+                          context,
+                          icon: Icons.history,
+                          label: local.history,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    HistoryScreen(onLocaleChange: onLocaleChange),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 40),
+                        _buildActionCard(
+                          context,
+                          icon: Icons.info_outline,
+                          label: local.about,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const AboutScreen()),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 40),
+                        _buildActionCard(
+                          context,
+                          icon: Icons.lightbulb_outline,
+                          label: local.funFacts,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const FunFactsScreen()),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
                 ),
               ],

@@ -110,7 +110,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeTitle.
   ///
   /// In en, this message translates to:
-  /// **'Insect Identification'**
+  /// **'Main menu'**
   String get homeTitle;
 
   /// No description provided for @recognizeInsect.
@@ -352,6 +352,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Gallery'**
   String get gallery;
+
+  /// No description provided for @showAnotherFact.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Another Fact'**
+  String get showAnotherFact;
+
+  /// No description provided for @funFactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fun Insect Fact'**
+  String get funFactTitle;
+
+  /// No description provided for @funFacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Fun Facts'**
+  String get funFacts;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -2,7 +2,7 @@
   "@@locale": "mk",
   "appTitle": "Bugify",
   "splashSubtitle": "Идентификација на инсекти",
-  "homeTitle": "Идентификација на инсекти",
+  "homeTitle": "Главно мени",
   "recognizeInsect": "Препознај инсект",
   "history": "Историја на инсекти",
   "about": "За апликацијата",
@@ -42,5 +42,8 @@
   "scanInsect": "Препознај Инсект",
   "retryScan": "Не е овој инсект? Скенирај повторно",
   "camera": "Камера",
-  "gallery": "Галерија"
+  "gallery": "Галерија",
+  "showAnotherFact": "Покажи друг факт",
+  "funFactTitle": "Интересен факт за инсекти",
+  "funFacts" : "Интересни факти"
 }

@@ -2,7 +2,7 @@
   "@@locale": "en",
   "appTitle": "Bugify",
   "splashSubtitle": "Insect Identification",
-  "homeTitle": "Insect Identification",
+  "homeTitle": "Main menu",
   "recognizeInsect": "Recognize Insect",
   "history": "Insect History",
   "about": "About App",
@@ -42,5 +42,8 @@
   "scanInsect": "Scan Insect",
   "retryScan": "Not this insect? Scan again",
   "camera": "Camera",
-  "gallery": "Gallery"
+  "gallery": "Gallery",
+  "showAnotherFact": "Show Another Fact",
+  "funFactTitle": "Fun Insect Fact",
+  "funFacts" : "Fun Facts"
 }
