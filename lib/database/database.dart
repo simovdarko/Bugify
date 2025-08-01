@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/insect_model.dart';
+import '../models/user_model.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -11,27 +12,40 @@ class DatabaseHelper {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
+
     _database = await _initDB('bugfinder.db');
     return _database!;
   }
 
-  Future<Database> _initDB(String path) async {
+  Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
-    final dbLocation = join(dbPath, path);
+    final path = join(dbPath, filePath);
 
     return await openDatabase(
-      dbLocation,
-      version: 2,
+      path,
+      version: 4,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
   }
 
+
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE insects(
+      CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
+        username TEXT UNIQUE NOT NULL,
+        email TEXT UNIQUE,
+        password TEXT NOT NULL
+      )
+    ''');
+
+
+    await db.execute('''
+      CREATE TABLE insects (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        userId INTEGER NOT NULL,
+        name TEXT NOT NULL,
         description TEXT,
         imageUrl TEXT,
         scientificName TEXT,
@@ -47,10 +61,12 @@ class DatabaseHelper {
         activityPeriod TEXT,
         abilities TEXT,
         size REAL,
-        regions TEXT
+        regions TEXT,
+        FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
       )
     ''');
   }
+
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
@@ -62,35 +78,106 @@ class DatabaseHelper {
       await db.execute('ALTER TABLE insects ADD COLUMN abilities TEXT;');
       await db.execute('ALTER TABLE insects ADD COLUMN size REAL;');
       await db.execute('ALTER TABLE insects ADD COLUMN regions TEXT;');
+
+
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          username TEXT UNIQUE NOT NULL,
+          email TEXT UNIQUE,
+          password TEXT NOT NULL
+        )
+      ''');
+    }
+
+    if (oldVersion < 3) {
+      try {
+        await db.execute('ALTER TABLE users ADD COLUMN email TEXT UNIQUE;');
+      } catch (_) {}
+    }
+
+
+    if (oldVersion < 4) {
+      try {
+        await db.execute('ALTER TABLE insects ADD COLUMN userId INTEGER NOT NULL DEFAULT 0;');
+      } catch (_) {}
     }
   }
 
   Future<int> addInsect(InsectModel insect) async {
     final db = await instance.database;
-    try {
-      return await db.insert('insects', insect.toMap());
-    } catch (e) {
-      print("Error adding insect: $e");
-      rethrow;
-    }
+    return await db.insert('insects', insect.toMap());
   }
 
-  Future<List<InsectModel>> getInsects() async {
+  Future<List<InsectModel>> getInsectsByUser(int userId) async {
     final db = await instance.database;
-    try {
-      final result = await db.query('insects');
-      return result.map((json) => InsectModel.fromJson(json)).toList();
-    } catch (e) {
-      print("Error fetching insects: $e");
-      return [];
-    }
-  }
-  Future<void> deleteInsect(int id) async {
-    final db = await database;
-    await db.delete(
+    final result = await db.query(
       'insects',
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'userId = ?',
+      whereArgs: [userId],
+      orderBy: 'lastSeenTime DESC',
     );
+    return result.map((json) => InsectModel.fromJson(json)).toList();
+  }
+
+  Future<void> deleteInsect(int id) async {
+    final db = await instance.database;
+    await db.delete('insects', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> registerUser(UserModel user) async {
+    final db = await instance.database;
+    return await db.insert('users', user.toMap());
+  }
+
+  Future<UserModel?> getUser(String username, String password) async {
+    final db = await instance.database;
+    final result = await db.query(
+      'users',
+      where: 'username = ? AND password = ?',
+      whereArgs: [username, password],
+    );
+    if (result.isNotEmpty) {
+      return UserModel.fromJson(result.first);
+    }
+    return null;
+  }
+
+  Future<UserModel?> getUserByUsername(String username) async {
+    final db = await instance.database;
+    final result = await db.query(
+      'users',
+      where: 'username = ?',
+      whereArgs: [username],
+    );
+    if (result.isNotEmpty) {
+      return UserModel.fromJson(result.first);
+    }
+    return null;
+  }
+
+  Future<UserModel?> getUserByEmail(String email) async {
+    final db = await instance.database;
+    final result = await db.query(
+      'users',
+      where: 'email = ?',
+      whereArgs: [email],
+    );
+    if (result.isNotEmpty) {
+      return UserModel.fromJson(result.first);
+    }
+    return null;
+  }
+
+  Future<bool> isUsernameTaken(String username) async {
+    final db = await instance.database;
+    final result = await db.query('users', where: 'username = ?', whereArgs: [username]);
+    return result.isNotEmpty;
+  }
+
+  Future<bool> isEmailTaken(String email) async {
+    final db = await instance.database;
+    final result = await db.query('users', where: 'email = ?', whereArgs: [email]);
+    return result.isNotEmpty;
   }
 }

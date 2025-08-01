@@ -149,4 +149,12 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get funFacts => 'Интересни факти';
+
+  @override
+  String welcomeUser(Object username) {
+    return 'Добредојде, $username';
+  }
+
+  @override
+  String get logout => 'Одјава';
 }

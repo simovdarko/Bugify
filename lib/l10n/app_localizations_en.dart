@@ -149,4 +149,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get funFacts => 'Fun Facts';
+
+  @override
+  String welcomeUser(Object username) {
+    return 'Welcome, $username';
+  }
+
+  @override
+  String get logout => 'Logout';
 }

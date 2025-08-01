@@ -45,5 +45,7 @@
   "gallery": "Галерија",
   "showAnotherFact": "Покажи друг факт",
   "funFactTitle": "Интересен факт за инсекти",
-  "funFacts" : "Интересни факти"
+  "funFacts" : "Интересни факти",
+  "welcomeUser": "Добредојде, {username}",
+  "logout": "Одјава"
 }

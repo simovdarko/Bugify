@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../database/database.dart';
 import '../l10n/app_localizations.dart';
@@ -16,18 +17,41 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  late Future<List<InsectModel>> insectHistory;
+  Future<List<InsectModel>>? insectHistory;
+  int? _currentUserId;
 
   @override
   void initState() {
     super.initState();
-    _refreshInsectHistory();
+    _loadCurrentUserAndRefreshHistory();
+  }
+
+  Future<void> _loadCurrentUserAndRefreshHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final username = prefs.getString('username');
+
+    if (username != null) {
+      final user = await DatabaseHelper.instance.getUserByUsername(username);
+      if (user != null) {
+        setState(() {
+          _currentUserId = user.id;
+          insectHistory = DatabaseHelper.instance.getInsectsByUser(_currentUserId!);
+        });
+        return;
+      }
+    }
+
+    setState(() {
+      insectHistory = Future.value([]);
+    });
   }
 
   void _refreshInsectHistory() {
-    setState(() {
-      insectHistory = DatabaseHelper.instance.getInsects();
-    });
+    if (_currentUserId != null) {
+      setState(() {
+        insectHistory = DatabaseHelper.instance.getInsectsByUser(_currentUserId!);
+      });
+    }
   }
 
   void _confirmDelete(BuildContext context, InsectModel insect) {

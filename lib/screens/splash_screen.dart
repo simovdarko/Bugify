@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'home_screen.dart';
+import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   final Function(Locale) onLocaleChange;
@@ -20,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     _animateText();
-    _navigateToHome();
+    _navigateToNextScreen();
   }
 
   void _animateText() {
@@ -36,14 +39,28 @@ class _SplashScreenState extends State<SplashScreen> {
     });
   }
 
-  void _navigateToHome() async {
+  void _navigateToNextScreen() async {
+    // Wait for animation + some buffer
     await Future.delayed(const Duration(seconds: 3));
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => HomeScreen(onLocaleChange: widget.onLocaleChange),
-      ),
-    );
+
+    final prefs = await SharedPreferences.getInstance();
+    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    if (isLoggedIn) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(onLocaleChange: widget.onLocaleChange),
+        ),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginScreen(onLocaleChange: widget.onLocaleChange),
+        ),
+      );
+    }
   }
 
   @override

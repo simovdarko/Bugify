@@ -370,6 +370,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fun Facts'**
   String get funFacts;
+
+  /// No description provided for @welcomeUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome, {username}'**
+  String welcomeUser(Object username);
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

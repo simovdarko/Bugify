@@ -1,5 +1,6 @@
 class InsectModel {
   final int? id;
+  final int? userId;
   final String name;
   final String description;
   final String activeTime;
@@ -20,6 +21,7 @@ class InsectModel {
 
   InsectModel({
     this.id,
+    this.userId,
     required this.name,
     required this.description,
     required this.activeTime,
@@ -42,6 +44,7 @@ class InsectModel {
   factory InsectModel.fromJson(Map<String, dynamic> json) {
     return InsectModel(
       id: json['id'],
+      userId: json['userId'],
       name: json['name'] ?? '',
       description: json['description'] ?? '',
       activeTime: json['activeTime'] ?? '',
@@ -68,6 +71,7 @@ class InsectModel {
 
   Map<String, dynamic> toMap() {
     final map = {
+      'userId': userId,
       'name': name,
       'description': description,
       'activeTime': activeTime,

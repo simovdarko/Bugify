@@ -45,5 +45,7 @@
   "gallery": "Gallery",
   "showAnotherFact": "Show Another Fact",
   "funFactTitle": "Fun Insect Fact",
-  "funFacts" : "Fun Facts"
+  "funFacts" : "Fun Facts",
+  "welcomeUser": "Welcome, {username}",
+  "logout": "Logout"
 }
