@@ -60,7 +60,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(local.delete, style: const TextStyle(color: Color(0xFF2E7D32))),
-        content: Text('${local.confirmDelete} "${insect.name}"?'),
+        content: Text(local.confirmDelete.replaceFirst('{insectName}', insect.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
@@ -177,19 +177,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          insect.name,
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.green[800],
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                      ],
+                                    child: Text(
+                                      insect.name,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.green[800],
+                                      ),
                                     ),
                                   ),
                                   IconButton(

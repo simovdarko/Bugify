@@ -2,26 +2,30 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../database/database.dart';
 import '../models/insect_model.dart';
 
 class AzureVisionService {
-
 
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
 
   Future<InsectModel> processInsectImage(String imagePath, BuildContext context) async {
     try {
       final insectName = await recognizeInsect(imagePath);
-
       if (insectName == 'Unknown insect') {
         throw Exception("Инсектот не е препознаен.");
       }
 
       final locale = Localizations.localeOf(context).languageCode;
       final insectDetails = await getInsectDetailsFromOpenAI(insectName, locale);
+      final prefs = await SharedPreferences.getInstance();
+      final username = prefs.getString('username');
+      final currentUser = await DatabaseHelper.instance.getUserByUsername(username ?? '');
+      final userId = currentUser?.id ?? 0;
 
       final insect = InsectModel(
+        userId: userId,
         name: insectDetails['name'] ?? 'Unknown',
         description: insectDetails['description'] ?? '',
         activeTime: insectDetails['activeTime'] ?? '',
